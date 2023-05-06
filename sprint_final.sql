@@ -70,4 +70,43 @@ INSERT INTO proveedor_producto (id_proveedor, id_producto, stock) VALUE
 ('3', '3','15'),  
 ('4', '4', '5'),  
 ('5', '5', '20'); 
+
+
+SELECT categoria, COUNT(*) AS cantidad FROM productos 
+GROUP BY categoria 
+ORDER BY cantidad DESC 
+LIMIT 1;
+
+SELECT nombre_producto, stock FROM productos
+ORDER BY stock DESC
+LIMIT 10;
+
+SELECT color, COUNT(*) AS cantidad
+FROM productos
+GROUP BY color
+ORDER BY cantidad DESC
+LIMIT 1;
+
+SELECT p.nombre_corporativo, SUM(pp.stock) AS stock_total
+FROM proveedores p
+INNER JOIN proveedor_producto pp ON p.id_proveedor = pp.id_proveedor
+GROUP BY p.nombre_corporativo
+ORDER BY stock_total ASC
+LIMIT 1;
+
+  
+CREATE TEMPORARY TABLE temp_table
+SELECT categoria FROM productos
+GROUP BY categoria
+ORDER BY COUNT(*) DESC
+LIMIT 1;
+
+UPDATE productos
+SET categoria = 'Electrónica y computación'
+WHERE categoria = (
+  SELECT categoria
+  FROM temp_table
+);
+
+DROP TEMPORARY TABLE temp_table;
   
