@@ -1,7 +1,14 @@
+-- creacion de base de datos
 CREATE DATABASE TeLoVendo;  
-
 USE TeLoVendo; 
 
+-- creacion de usuario 
+CREATE USER 'admintlv'@'localhost' IDENTIFIED BY 'admin123';
+GRANT ALL PRIVILEGES ON TeLoVendo.* TO 'admintlv'@'localhost';
+-- se actualizan los privilegios 
+FLUSH PRIVILEGES;
+
+--creacion de tablas solicitadas 
 CREATE TABLE proveedores ( 
   id_proveedor INT PRIMARY KEY AUTO_INCREMENT, 
   nombre_representante VARCHAR(50), 
@@ -38,6 +45,7 @@ CREATE TABLE proveedor_producto (
   FOREIGN KEY (id_producto) REFERENCES productos(id_producto) 
 ); 
 
+--se ingresan datos en la base de datos
 INSERT INTO proveedores (nombre_representante, nombre_corporativo, telefono1, nombre_contacto1, telefono2, nombre_contacto2, categoria, correo_facturacion) VALUE  
 ('Carlos Gomez', 'CGOMEZ CIA', '+5691111111', 'Carlos Gomez', '+56912345678', 'Roberto Toro', 'Electronica', 'contacto@cgomezcia.cl'),  
 ('Luis Perez', 'LPEREZ CIA', '+5692222222', 'Fernando Torres', '+56923456789', 'Luis Perez', 'Computacion', 'contacto@lperezcia.com'), 
@@ -72,21 +80,29 @@ INSERT INTO proveedor_producto (id_proveedor, id_producto, stock) VALUE
 ('5', '5', '20'); 
 
 
+
+-- Consultas necesarias del Sprint Final del Modulo 3
+
+
+--Cuál es la categoría de productos que más se repite.
 SELECT categoria, COUNT(*) AS cantidad FROM productos 
-GROUP BY categoria 
+GROUP BY categoria   
 ORDER BY cantidad DESC 
 LIMIT 1;
 
+-- Cuáles son los productos con mayor stock.
 SELECT nombre_producto, stock FROM productos
 ORDER BY stock DESC
 LIMIT 10;
 
+-- Qué color de producto es más común en nuestra tienda.
 SELECT color, COUNT(*) AS cantidad
 FROM productos
 GROUP BY color
 ORDER BY cantidad DESC
 LIMIT 1;
 
+-- Cual o cuales son los proveedores con menor stock de productos.
 SELECT p.nombre_corporativo, SUM(pp.stock) AS stock_total
 FROM proveedores p
 INNER JOIN proveedor_producto pp ON p.id_proveedor = pp.id_proveedor
@@ -94,13 +110,17 @@ GROUP BY p.nombre_corporativo
 ORDER BY stock_total ASC
 LIMIT 1;
 
-  
+
+-- Cambien la categoría de productos más popular por ‘Electrónica y computación’.
+
+-- se crea una tabla temporal con la consulta  de la catergoria que mas se repite debido a que ocurre un error
 CREATE TEMPORARY TABLE temp_table
 SELECT categoria FROM productos
 GROUP BY categoria
 ORDER BY COUNT(*) DESC
 LIMIT 1;
 
+-- se actuliza la categoria mas popular por 'Electrónica y computación'
 UPDATE productos
 SET categoria = 'Electrónica y computación'
 WHERE categoria = (
@@ -108,5 +128,6 @@ WHERE categoria = (
   FROM temp_table
 );
 
+-- se elimina la tabla temporal despues de ser usasda 
 DROP TEMPORARY TABLE temp_table;
   
